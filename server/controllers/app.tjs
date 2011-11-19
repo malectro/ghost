@@ -1,0 +1,8 @@
+/**
+ * App
+ * default controller
+ */
+
+exports.index = function () {
+  return 'hi';
+};

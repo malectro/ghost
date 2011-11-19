@@ -1,0 +1,36 @@
+var http = require('http')
+    url = require('url');
+
+var controllers = {
+  app: 'tjs'
+};
+
+http.createServer(function (req, res) {
+  var resOb, controller;
+
+  reqUrl = url.parse(req.url, true);
+  reqUrl.pathArr = reqUrl.pathname.split('.');
+  reqUrl.filetype = reqUrl.pathArr[1] || 'json';
+  reqUrl.pathArr = reqUrl.pathArr[0].split('/');
+  reqUrl.controller = reqUrl.pathArr[1] || 'app';
+  reqUrl.method = reqUrl.pathArr[2] || 'index';
+
+  //console.log(reqUrl)
+  if (!controllers[reqUrl.controller]) {
+    reqUrl.controller = 'app';
+  }
+
+  controller = require('./controllers/' + reqUrl.controller + '.tjs');
+
+  if (typeof controller[reqUrl.method] === 'function') {
+    resOb = {e: 0, r: controller[reqUrl.method](reqUrl.query)};
+  }
+  else {
+    resOb = {e: 1};
+  }
+
+  res.writeHead(200, {'Content-Type': 'text/json'});
+  res.end(JSON.stringify(resOb));
+}).listen(1337, "127.0.0.1");
+console.log('Server running at http://127.0.0.1:1337/');
+
