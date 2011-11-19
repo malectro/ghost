@@ -1,0 +1,33 @@
+var assert = require('assert'),
+    mongo = require('mongodb'),
+    Db = mongo.Db,
+    Server = mongo.Server;
+
+var client = new Db('test', new Server('127.0.0.1', 27017, {}));
+
+var e, stuff;
+
+await {
+  client.open(defer(e, stuff));
+}
+await {
+  client.collection('test_insert', defer(e, collection)); 
+}
+await {
+  collection.remove({a: 2});
+}
+await {
+  collection.insert({a: 2});
+}
+await {
+  collection.count(defer(e, count));
+  collection.find().toArray(defer(e2, results));
+}
+
+console.log(results);
+assert.equal(1, count);
+assert.equal(1, results.length);
+assert.ok(results[0].a === 2);
+
+client.close();
+
