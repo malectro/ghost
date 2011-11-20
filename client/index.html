@@ -1,0 +1,95 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>My Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</head> 
+<body> 
+
+<!-- Start of first page -->
+<div data-role="page" id="foo">
+
+	<div data-role="header">
+		<h1>G(host)</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<p>Welcome to (G)host, the kewlest game around, bro</p>	
+		<a href="#start" data-role="button">Start game!</a>
+		<a href="#join" data-role="button">Join game!</a>
+		<a href="#continue" data-role="button">Continue games</a>
+		<a href="#" data-role="button">View profile/stats</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>(G)host</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Start of start game -->
+<div data-role="page" id="start">
+
+	<div data-role="header">
+		<h1>Start a game</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<h2>Are you ready to start???!?!</h2>
+		<a href='#publicStart' data-role="button">Start a public game</a>
+		<a href='#privateStart' data-role="button">Start a private game</a>		
+		<a href='#foo' data-role="button">Home</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>(G)(host)</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of join game -->
+<div data-role="page" id="join">
+
+	<div data-role="header">
+		<h1>Join a game</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<h2>Find some losers to play with</h2>
+		<ul data-role="listview" data-theme="c">
+			<li><a href="#">Kyle - Disembodied spirit</a></li>
+			<li><a href="#">Danny - Poltergeist</a></li>
+			<li><a href="#">Pat - Apparition</a></li>
+			<li><a href="#">Alex - dubGhost</a></li>
+		</ul>
+		<a href='#foo' data-role="button">Home</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>G(host)</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!--> Start of continue game  -->
+<div data-role="page" id="continue">
+	
+	<div data-role="header">
+		<h1>Continue your games</h1>
+	</div>
+	
+	<div data-role="content">	
+		<h2>Pick a game to rock</h2>
+		<ul data-role="listview" data-theme="c">
+			<li><a href="#">Game 1</a></li>
+			<li><a href="#">Game 2</a></li>
+			<li><a href="#">Game 3</a></li>
+			<li><a href="#">Game 4</a></li>
+		</ul>
+		<a href='#foo' data-role="button">Home</a>
+</body>
+
+</html>
+
+
