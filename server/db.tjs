@@ -21,3 +21,15 @@ exports.client = function (callback) {
   callback(_client);
 };
 
+exports.getCollection = function (name, callback) {
+  var client, collection, e;
+
+  await {
+    this.client(defer(client));
+  }
+  await {
+    client.collection(name, defer(e, collection));
+  }
+
+  callback(collection, client); 
+};

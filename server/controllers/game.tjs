@@ -1,0 +1,63 @@
+var db = require(global.DIR_SERVER + '/db.tjs'),
+    collectionName = 'games';
+
+exports.index = function (options, callback) {
+  await {
+    db.getCollection('games', defer(games, client));
+  }
+  await {
+    games.count(defer(e, count));
+    games.find().toArray(defer(e2, results));
+  }
+  console.log(results);
+  callback(count.toString() + ' games');
+};
+
+/**
+ * game.create
+ * will create a new 'games' document with the provided list of player IDs.
+ * @param {function} callback
+ * @param {object} options
+ */
+exports.create = function (options, callback) {
+
+  var games,
+      client,
+      e,
+      results,
+      firstPlayer,
+      playerList,
+      playerString = options['players'];
+  
+  if (playerString) {
+    playerList = playerString.split(',');
+    firstPlayer = playerList[0];
+  } else {
+    return callback({e: 1, msg: 'Must specify players in ' +
+                                'players=userid1,userid2 format'});
+  }
+  
+  var newGame = {
+    players: playerList,
+    state: '',
+    current: firstPlayer
+  };
+
+  await {
+    db.getCollection(collectionName, defer(games, client));
+  }
+
+  await {
+    games.insert(newGame, defer(e, results));
+  } 
+
+  console.log(e, results)
+
+  client.close();
+  if (e) {
+    return callback({e: 2, msg: e});
+  } else {
+    return callback({e: 0, msg: 'Success'});
+  }
+
+};

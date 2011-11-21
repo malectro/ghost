@@ -4,7 +4,8 @@ var http = require('http')
 
 var controllers = {
   app: 'tjs',
-  user: 'tjs'
+  user: 'tjs',
+  game: 'tjs'
 };
 
 http.createServer(function (req, res) {
@@ -17,7 +18,6 @@ http.createServer(function (req, res) {
   reqUrl.controller = reqUrl.pathArr[1] || 'app';
   reqUrl.method = reqUrl.pathArr[2] || 'index';
 
-  //console.log(reqUrl)
   if (!controllers[reqUrl.controller]) {
     reqUrl.controller = 'app';
   }

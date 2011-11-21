@@ -1,19 +1,9 @@
 var db = require(global.DIR_SERVER + '/db.tjs');
 
-function getCollection(callback) {
-  var client, users, e;
-
-  await {
-    db.client(defer(client));
-  }
-  await {
-    client.collection('users', defer(e, users));
-  }
-
-  callback(users, client); 
+function validatePhone(phone) {
 }
 
-function validatePhone(phone) {
+function validateEmail(email) {
 }
 
 function defaults(defaults, given) {
@@ -32,7 +22,15 @@ function defaults(defaults, given) {
 }
 
 exports.index = function (options, callback) {
- callback('user stuff'); 
+  await {
+    db.getCollection('users', defer(users, client));
+  }
+  await {
+    users.count(defer(e, count));
+    users.find().toArray(defer(e2, results));
+  }
+  console.log(results);
+  callback(count.toString() + ' users');
 };
 
 exports.create = function (options, callback) {
@@ -42,7 +40,7 @@ exports.create = function (options, callback) {
     email: '',
     phone: 0,
     name: 'Specter'
-  }, options);;
+  }, options);
 
   // format some data
   if (user.phone) {
@@ -55,7 +53,7 @@ exports.create = function (options, callback) {
   }
 
   await {
-    getCollection(defer(users, client));
+    db.getCollection('users', defer(users, client));
   }
 
   if (user.email) {
@@ -100,7 +98,7 @@ exports.get = function (options, callback) {
   var client, users, e, list;
 
   await {
-    getCollection(defer(users, client));
+    db.getCollection('users', defer(users, client));
   }
   await {
     users.find(user).toArray(defer(e, list));
