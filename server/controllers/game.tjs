@@ -1,6 +1,12 @@
 var db = require(global.DIR_SERVER + '/db.tjs'),
     collectionName = 'games';
 
+/**
+ * game.index
+ * will list out all created games.
+ * @param {function} callback
+ * @param {object} options
+ */
 exports.index = function (options, callback) {
   await {
     db.getCollection('games', defer(games, client));
@@ -9,13 +15,15 @@ exports.index = function (options, callback) {
     games.count(defer(e, count));
     games.find().toArray(defer(e2, results));
   }
+  
   console.log(results);
   callback(count.toString() + ' games');
+
 };
 
 /**
  * game.create
- * will create a new 'games' document with the provided list of player IDs.
+ * will create a new game with the provided list of player IDs.
  * @param {function} callback
  * @param {object} options
  */
@@ -29,13 +37,13 @@ exports.create = function (options, callback) {
       playerList,
       playerString = options['players'];
   
-  if (playerString) {
-    playerList = playerString.split(',');
-    firstPlayer = playerList[0];
-  } else {
+  if (!playerString) {
     return callback({e: 1, msg: 'Must specify players in ' +
                                 'players=userid1,userid2 format'});
   }
+  
+  playerList = playerString.split(',');
+  firstPlayer = playerList[0];
   
   var newGame = {
     players: playerList,
@@ -51,7 +59,7 @@ exports.create = function (options, callback) {
     games.insert(newGame, defer(e, results));
   } 
 
-  console.log(e, results)
+  console.log(e, results);
 
   client.close();
   if (e) {
@@ -60,4 +68,69 @@ exports.create = function (options, callback) {
     return callback({e: 0, msg: 'Success'});
   }
 
+};
+
+
+/**
+ * game.get
+ * will return either a specific game or all active games for the provided userID.
+ * @param {function} callback
+ * @param {object} options
+ */
+exports.get = function (options, callback) {
+
+  var gameId = options['gameid'],
+      userId = options['userid'],
+      games,
+      client;
+  
+  if (!gameId && !userId) {
+    return callback({e:1, msg: 'You must provide either a game ID in the ' +
+                               'format gameid=12345 or a user ID in the ' +
+                               'format userid=12345'});
+  }
+  
+  await {
+    db.getCollection(collectionName, defer(games, client));
+  }
+  
+  // Retrieve game with provided game ID.
+  if (gameId) {
+    var gameDetails,
+        e,
+        game = {_id: new client.bson_serializer.ObjectID(gameId)};  
+  
+    await {
+      games.find(game).toArray(defer(e, gameDetails));
+    }
+    console.log(game);
+  
+    if (gameDetails.length) {
+      callback({e: 0, game: gameDetails[0]});
+    } else {
+      callback({e: 2, msg: 'No game with that ID found'});
+    }
+    
+    client.close();
+  
+  }
+  
+  // Retrieve a list of games with provided user ID as one of the participants.
+  if (userId) {
+    var gameList,
+        e,
+        game = {players: userId};
+    
+    await {
+      games.find(game).toArray(defer(e, gameList));
+    }
+    
+    if (gameList.length) {
+      callback({e: 0, games: gameList});
+    } else {
+      callback({e: 2, msg: 'No games with that user.'});
+    }
+    
+    client.close();
+  }
 };
