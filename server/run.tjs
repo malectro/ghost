@@ -1,12 +1,14 @@
 var http = require('http')
-    url = require('url');
+    url = require('url')
+    config = require('./config.js');
 
 var controllers = {
-  app: 'tjs'
+  app: 'tjs',
+  user: 'tjs'
 };
 
 http.createServer(function (req, res) {
-  var resOb, controller;
+  var resOb, controller, reqUrl, response;
 
   reqUrl = url.parse(req.url, true);
   reqUrl.pathArr = reqUrl.pathname.split('.');
@@ -20,14 +22,18 @@ http.createServer(function (req, res) {
     reqUrl.controller = 'app';
   }
 
-  controller = require('./controllers/' + reqUrl.controller + '.tjs');
+  controller = require(global.DIR_CONTROLLERS + '/' + reqUrl.controller + '.tjs');
 
-  if (typeof controller[reqUrl.method] === 'function') {
-    resOb = {e: 0, r: controller[reqUrl.method](reqUrl.query)};
+  if (typeof controller[reqUrl.method] !== 'function') {
+    reqUrl.method = 'index';
   }
-  else {
-    resOb = {e: 1};
+
+  console.log(reqUrl);
+
+  await {
+    controller[reqUrl.method](reqUrl.query, defer(response));
   }
+  resOb = {e: 0, r: response};
 
   res.writeHead(200, {'Content-Type': 'text/json'});
   res.end(JSON.stringify(resOb));

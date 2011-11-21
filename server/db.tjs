@@ -1,0 +1,23 @@
+var mongo = require('mongodb'),
+    Db = mongo.Db,
+    Server = mongo.Server,
+
+    dbName = 'ghost',
+    host = '127.0.0.1',
+    port = 27017;
+
+var _client = new Db(dbName, new Server(host, port, {}));
+
+/**
+ * db.client
+ * will give a new client object to the callback function
+ * @param {function} callback
+ */
+exports.client = function (callback) {
+  var e, stuff;
+  await {
+    _client.open(defer(e, stuff));
+  }
+  callback(_client);
+};
+

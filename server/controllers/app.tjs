@@ -3,6 +3,6 @@
  * default controller
  */
 
-exports.index = function () {
-  return 'hi';
+exports.index = function (options, callback) {
+  callback('hi');;
 };
