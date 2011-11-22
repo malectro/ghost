@@ -46,9 +46,10 @@ exports.create = function (options, callback) {
   firstPlayer = playerList[0];
   
   var newGame = {
+    letters: '',
     players: playerList,
-    state: '',
-    current: firstPlayer
+    currentPlayer: firstPlayer,
+    state: 'CREATED'
   };
 
   await {

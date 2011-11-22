@@ -1,4 +1,5 @@
-var db = require(global.DIR_SERVER + '/db.tjs');
+var db = require(global.DIR_SERVER + '/db.tjs'),
+    bcrypt = require('bcrypt');
 
 function validatePhone(phone) {
 }
@@ -37,20 +38,49 @@ exports.create = function (options, callback) {
   var client, users, finder, count, errorType;
 
   var user = defaults({
+    username: 'Specter',
+    // Facebook Login info
+    fbid: '',
+    accessToken: '',
+    expires: '',
+    // If not using Facebook, provide password
+    password: 'password',
+    // Either email or phone is required
     email: '',
-    phone: 0,
-    name: 'Specter'
+    phone: '123-456-7890',
+    image: '',
   }, options);
+  
+  // Check if all facebook access info is provided
+  if (!user.fbid && !user.accessToken && !user.expires) {
+    // Check if a password is provided
+    if (user.password) {
+      var pwd = user.password;
+      // Hash password using bcrypt
+      await {
+        bcrypt.gen_salt(10, defer(err, salt));
+      }
+      await {
+        bcrypt.encrypt(pwd, salt, defer(err, hash));
+      }
+      user.password = hash;
+    } else {
+      return callback({e: 1, msg: 'Please provide a password or ' +
+                                  'a facebook access token'});
+    }
+  }
+  
+  // user creation requires email or phone
+  if (!user.email && !user.phone) {
+    return callback({e: 2, msg: 'Please specify an email or phone.'});
+  }
 
   // format some data
   if (user.phone) {
     user.phone = parseInt(user.phone, 10);
   }
-
-  // user creation requires email or phone
-  if (!user.email && !user.phone) {
-    return callback({e: 1, msg: 'Please specify an email or phone.'});
-  }
+  
+  console.log(user);
 
   await {
     db.getCollection('users', defer(users, client));
@@ -71,7 +101,7 @@ exports.create = function (options, callback) {
 
   if (count > 0) {
     client.close();
-    return callback({e: 2, msg: 'There is already a user with that ' + errorType + '.'});
+    return callback({e: 3, msg: 'There is already a user with that ' + errorType + '.'});
   }
 
   await {
@@ -84,6 +114,30 @@ exports.create = function (options, callback) {
   return callback({e: 0, msg: 'Success'});
 };
 
+
+exports.authenticate = function (options, callback) {
+  
+  await {
+    this.get(options, defer(query));
+  }
+  var user = query.user;
+  console.log(user);
+  
+  var testpass = 'password';
+
+  await {
+    bcrypt.compare(testpass, user.password, defer(err, res));
+  }
+  
+  if (res) {
+    return callback({e: 0, msg: 'Authenticated!'});
+  } else {
+    return callback({e: 1, msg: 'Username and password do not match.'});
+  }
+
+};
+
+
 exports.get = function (options, callback) {
   var user = defaults({
     _id: null,
@@ -93,7 +147,13 @@ exports.get = function (options, callback) {
 
   if (!user._id && !user.email && !user.phone) {
     return callback({e:1, msg: 'You must specify an index.'});
-  } 
+  }
+  
+  // Format phone # query correctly
+  if (user.phone) {
+    var intPhone = parseInt(user.phone, 10);
+    user.phone = intPhone;
+  }
 
   var client, users, e, list;
 

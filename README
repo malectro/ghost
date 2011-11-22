@@ -7,4 +7,5 @@ mongodb
 npm
 npm mongodb
 tamejs
+npm bcrypt
 
