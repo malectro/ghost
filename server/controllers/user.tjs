@@ -49,7 +49,6 @@ exports.create = function (options, callback) {
     // Either email or phone is required
     email: '',
     phone: '123-456-7890',
-    image: '',
   }, options);
   
   // Check if all facebook access info is provided
@@ -80,8 +79,6 @@ exports.create = function (options, callback) {
   if (user.phone) {
     user.phone = parseInt(user.phone, 10);
   }
-  
-  console.log(user);
 
   await {
     db.getCollection('users', defer(users, client));
@@ -106,13 +103,14 @@ exports.create = function (options, callback) {
   }
 
   await {
-    users.insert(user, defer(e, stuff));
+    users.insert(user, defer(e, storedUser));
   } 
 
-  console.log(e, stuff)
+  console.log(e, storedUser)
 
   client.close();
-  return callback({e: 0, msg: 'Success'});
+  return callback({e: 0,
+                   userId: storedUser[0]._id});
 };
 
 

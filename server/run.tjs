@@ -45,7 +45,6 @@ http.createServer(function (req, res) {
       data = postData;
     });
     
-    
   } else {
     data = reqUrl.query;    
   }
@@ -53,7 +52,7 @@ http.createServer(function (req, res) {
   await {
     controller[reqUrl.method](data, defer(response));
   }
-  resOb = {e: 0, r: response};
+  resOb = response;
   
   //JSONP handling.
   var callback = reqUrl.query['callback'],
