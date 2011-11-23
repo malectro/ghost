@@ -6,6 +6,12 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+	<script>
+	  var ajaxResponse;
+	  function storeResponse(response) {
+	    ajaxResponse = response;
+	  }
+	</script>
 </head> 
 <body> 
 
@@ -22,6 +28,7 @@
 		<a href="#join" data-role="button">Join game!</a>
 		<a href="#continue" data-role="button">Continue games</a>
 		<a href="#" data-role="button">View profile/stats</a>
+		<a href="#test" data-role="button">TEST POST</a>
 	</div><!-- /content -->
 
 	<div data-role="footer">
@@ -77,7 +84,7 @@
 	
 	<div data-role="header">
 		<h1>Continue your games</h1>
-	</div>
+	</div><!-- /header -->
 	
 	<div data-role="content">	
 		<h2>Pick a game to rock</h2>
@@ -88,6 +95,35 @@
 			<li><a href="#">Game 4</a></li>
 		</ul>
 		<a data-rel="back" data-role="button">Home</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>G(host)</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!--> Start of TEST POST  -->
+<div data-role="page" id="test">
+	
+	<div data-role="header">
+		<h1>TEST POST TO SERVER</h1>
+	</div><!-- /header -->
+	
+	<div data-role="content">	
+		<h2>Send some content to the server</h2>
+        <form action="http://127.0.0.1:1337/user/" method="post">
+        <textarea name="text" rows="20" cols="60"></textarea>
+        <input type="submit" value="Submit text" />
+        </form>
+		<a data-rel="back" data-role="button">Home</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>G(host)</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
 </body>
 
 </html>

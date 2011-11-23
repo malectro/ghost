@@ -23,6 +23,7 @@ function defaults(defaults, given) {
 }
 
 exports.index = function (options, callback) {
+  console.log(options);
   await {
     db.getCollection('users', defer(users, client));
   }

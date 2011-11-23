@@ -8,8 +8,9 @@ var controllers = {
   game: 'tjs'
 };
 
+
 http.createServer(function (req, res) {
-  var resOb, controller, reqUrl, response;
+  var resOb, controller, reqUrl, response, data;
 
   reqUrl = url.parse(req.url, true);
   reqUrl.pathArr = reqUrl.pathname.split('.');
@@ -30,13 +31,42 @@ http.createServer(function (req, res) {
 
   console.log(reqUrl);
 
+  //TODO(dbow): This is probably useless since JSONP doesn't allow POSTs...
+  if (req.method == 'POST') {
+    
+    var postData = "";
+    req.setEncoding("utf8");
+    req.addListener("data", function(postDataChunk) {
+      postData += postDataChunk;
+      console.log("Received POST data chunk '"+
+      postDataChunk + "'.");
+    });
+    req.addListener("end", function() {
+      data = postData;
+    });
+    
+    
+  } else {
+    data = reqUrl.query;    
+  }
+  
   await {
-    controller[reqUrl.method](reqUrl.query, defer(response));
+    controller[reqUrl.method](data, defer(response));
   }
   resOb = {e: 0, r: response};
+  
+  //JSONP handling.
+  var callback = reqUrl.query['callback'],
+      callbackPrefix = '',
+      callbackSuffix = '';
+  if(callback) {
+    callbackPrefix = callback + '(';
+    callbackSuffix = ')';
+  }
 
   res.writeHead(200, {'Content-Type': 'text/json'});
-  res.end(JSON.stringify(resOb));
+  res.end(callbackPrefix + JSON.stringify(resOb) + callbackSuffix);
+
 }).listen(1337, "127.0.0.1");
 console.log('Server running at http://127.0.0.1:1337/');
 
