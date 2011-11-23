@@ -117,7 +117,7 @@ exports.create = function (options, callback) {
   return callback({e: 0,
                    request: 'create',
                    userId: storedUser[0]._id,
-                   name: storedUser[0].username});
+                   username: storedUser[0].username});
 };
 
 
@@ -139,7 +139,10 @@ exports.authenticate = function (options, callback) {
   }
   
   if (res) {
-    return callback({e: 0, request: 'login', msg: 'Authenticated!'});
+    return callback({e: 0, request: 'login',
+                           msg: 'Authenticated!',
+                           userId: query.user._id,
+                           username: query.user.username});
   } else {
     return callback({e: 1, request: 'login', msg: 'Username and/or password invalid.'});
   }

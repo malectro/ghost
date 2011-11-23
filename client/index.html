@@ -18,7 +18,7 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		<p>Welcome to (G)host, the kewlest game around, bro</p>
+		<p>Welcome to (G)host, the kewlest game around, <span id="username">bro</span></p>
 		<a href="#create" data-role="button" class="without-profile">Create a profile</a>
 		<a href="#login" data-role="button" class="without-profile">Login</a>
 		<a href="#start" data-role="button" class="with-profile">Start game!</a>
@@ -165,10 +165,15 @@
 	
 	  var me = {},
 	           _userId,
+	           _username,
 	           _error;
 	
 	  me.getUserId = function () {
         return _userId;
+      };
+
+	  me.getUsername = function () {
+        return _username;
       };
 
 	  me.getError = function () {
@@ -177,22 +182,29 @@
 	
 	  me.checkCredentials = function () {
 		_userId = window.localStorage.getItem('userId');
+		_username = window.localStorage.getItem('username');
+		// If there's not a user ID, only show create/login options.
 	    if(!_userId) {
 	      $('.with-profile').hide();
 	      Game.Ajax.create();
 	      Game.Ajax.login();
         } else {
+	      // If there is a user ID, show gameplay options.
 	      $('.with-profile').show();
 	      $('.without-profile').hide();
+          // Personalize the page w/ the username.
+	      $('#username').text(_username);
         }
 	  };
 	
 	  me.setCredentials = function(response) {
 		if(response.e === 0) {
 		  window.localStorage.setItem('userId', response.userId);
+		  window.localStorage.setItem('username', response.username);
 		  window.location = '#foo';
 		  this.checkCredentials();
 		} else {
+		  // If there's a server-side error, show it.
 		  _error = response.msg;
 		  $('.error').hide();
 		  $('#' + response.request + '-error').text(_error).show();
@@ -207,7 +219,8 @@
 	Game.Ajax = (function() {
 	
 	  var me = {};
-	
+
+      // Set up submit handler for creation form
 	  me.create = function () {
 		$('#register-form').submit(function() {
 		  $.ajax({
@@ -220,7 +233,8 @@
 	      return false;
 	    });
 	  };
-	
+
+      // Set up submit handler for login form
 	  me.login = function () {
 		$('#login-form').submit(function() {
 		  $.ajax({
@@ -233,7 +247,6 @@
 	      return false;
 	    });
 	  };
-	
 	
 	  return me;
 	
