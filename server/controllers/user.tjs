@@ -65,14 +65,17 @@ exports.create = function (options, callback) {
       }
       user.password = hash;
     } else {
-      return callback({e: 1, msg: 'Please provide a password or ' +
-                                  'a facebook access token'});
+      return callback({e: 1,
+                       request: 'create',
+                       msg: 'Please provide a password or a facebook access token'});
     }
   }
   
   // user creation requires email or phone
   if (!user.email && !user.phone) {
-    return callback({e: 2, msg: 'Please specify an email or phone.'});
+    return callback({e: 2,
+                     request: 'create',
+                     msg: 'Please specify an email or phone.'});
   }
 
   // format some data
@@ -99,7 +102,9 @@ exports.create = function (options, callback) {
 
   if (count > 0) {
     client.close();
-    return callback({e: 3, msg: 'There is already a user with that ' + errorType + '.'});
+    return callback({e: 3,
+                     request: 'create',
+                     msg: 'There is already a user with that ' + errorType + '.'});
   }
 
   await {
@@ -110,28 +115,33 @@ exports.create = function (options, callback) {
 
   client.close();
   return callback({e: 0,
-                   userId: storedUser[0]._id});
+                   request: 'create',
+                   userId: storedUser[0]._id,
+                   name: storedUser[0].username});
 };
 
 
 exports.authenticate = function (options, callback) {
   
-  await {
-    this.get(options, defer(query));
-  }
-  var user = query.user;
-  console.log(user);
+  var userQuery = {username: options.username},
+      testpass = options.password;
   
-  var testpass = 'password';
-
   await {
-    bcrypt.compare(testpass, user.password, defer(err, res));
+    this.get(userQuery, defer(query));
+  }
+
+  if(query.e != 0) {
+    return callback({e: 1, request: 'login', msg: 'Username and/or password invalid.'});
+  }
+  
+  await {
+    bcrypt.compare(testpass, query.user.password, defer(err, res));
   }
   
   if (res) {
-    return callback({e: 0, msg: 'Authenticated!'});
+    return callback({e: 0, request: 'login', msg: 'Authenticated!'});
   } else {
-    return callback({e: 1, msg: 'Username and password do not match.'});
+    return callback({e: 1, request: 'login', msg: 'Username and/or password invalid.'});
   }
 
 };
@@ -140,11 +150,12 @@ exports.authenticate = function (options, callback) {
 exports.get = function (options, callback) {
   var user = defaults({
     _id: null,
+    username: null,
     email: null,
     phone: null 
   }, options);
 
-  if (!user._id && !user.email && !user.phone) {
+  if (!user._id && !user.email && !user.phone && !user.username) {
     return callback({e:1, msg: 'You must specify an index.'});
   }
   
