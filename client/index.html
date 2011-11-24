@@ -5,8 +5,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 	<link rel="stylesheet" href="css/main.css" />
+	
+	<!-- libraries -->
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+	<script type="text/javascript" src="js/lib/mustache.js"></script>
 </head> 
 <body> 
 
@@ -120,6 +123,8 @@
 		<label>Phone or Email</label>
 		<input type="text" name="current-user" />
 		<input type="submit" class="event_addInvitee" value="Add" />
+		<div class="start_msg"></div>
+		<div class="start_invitees"></div>
 		
 		<a id="game-start-private" data-role="button"></a>
 		
@@ -131,6 +136,10 @@
 		<h4>(G)(host)</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
+
+<div class="tmpl" title="start_invitee">
+  <div class="start_invitee">{{name}}</div>
+</div>
 
 <!-- Start of join game -->
 <div data-role="page" id="join">

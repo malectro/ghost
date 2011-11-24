@@ -116,6 +116,41 @@ Ghost.User = (function () {
       Ghost.Ajax.getUserInfo();
     }
   };
+  
+  me.get = function (getter, callback) {
+    Ghost.Ajax.get('/user/retrieve', {
+      data: getter,
+      success: callback
+    });
+  };
+  
+  me.getByEmailOrPhone = function (emailOrPhone) {
+    var getter = {};
+    
+    emailOrPhone = emailOrPhone.trim();
+  
+    if (me.isPhone(emailOrPhone)) {
+      getter.phone = emailOrPhone;
+    }
+    else if (me.isEmail(emailOrPhone)) {
+      getter.email = emailOrPhone;
+    }
+    else {
+      return Ghost.UI.Start.errorInvite('Not a valid email address or phone number');
+    }
+    
+    me.get(getter, function (user) {
+    
+    });
+  };
+  
+  me.isPhone = function (number) {
+    return /^\d+$/.test(number);
+  };
+  
+  me.isEmail = function (email) {
+    return /^[a-zA-Z0-9\+\._]+@[a-zA-Z0-9_]+\.[a-z]+$/.test(email);
+  };
 
   return me;
 
@@ -124,7 +159,7 @@ Ghost.User = (function () {
 Ghost.Game = (function () {
   var me = {};
 
-  me.addUser = function () {
+  me.addInvitee = function (emailOrPhone) {
   
   };
 
@@ -135,6 +170,20 @@ Ghost.Ajax = (function () {
 
   var me = {},
       _user;
+  
+  /**
+   * Ajax.get
+   * generic ajax wrapper
+   */
+  me.get = function (cmd, options) {
+    options = $.extend({
+      type: 'GET',
+      dataType: 'jsonp',
+      url: Ghost.SERVER_URL + cmd
+    }, {}, options);
+    
+    $.ajax(options);
+  };
 
   me.create = function (formData) {
     console.log('create');
@@ -197,7 +246,7 @@ Ghost.Ajax = (function () {
 
 }());
 
-me.Util = function () {
+Ghost.Util = (function () {
   var me = {};
   
   /**
@@ -229,7 +278,7 @@ me.Util = function () {
   };
   
   return me;
-};
+}());
 
 $(function () {
 
