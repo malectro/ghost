@@ -1,10 +1,12 @@
-var Game = {};
+var Ghost = {};
 
 (function () {
   
-Game.SERVER_URL = 'http://127.0.0.1:1337';
+Ghost.SERVER_URL = 'http://127.0.0.1:1337';
 
-Game.Credentials = (function () {
+Ghost.UI = {};
+
+Ghost.Credentials = (function () {
 
   var me = {},
            _userId,
@@ -64,7 +66,7 @@ Game.Credentials = (function () {
   me.logout = function () {
     // Clear out previous user's info
     me.setCredentials({e:0});
-    Game.User.setUser(null);
+    Ghost.User.setUser(null);
     
     $('#username').text('bro');
     $('#profile-username').text('');
@@ -80,7 +82,7 @@ Game.Credentials = (function () {
 }());
 
 
-Game.User = (function () {
+Ghost.User = (function () {
 
   var me = {},
       _user,
@@ -111,7 +113,7 @@ Game.User = (function () {
       $('#profile-email').text('Email: ' + _user.email);
       $('#profile-phone').text('Phone: ' + _user.phone);
     } else {
-      Game.Ajax.getUserInfo();
+      Ghost.Ajax.getUserInfo();
     }
   };
 
@@ -119,8 +121,17 @@ Game.User = (function () {
 
 }());
 
+Ghost.Game = (function () {
+  var me = {};
 
-Game.Ajax = (function () {
+  me.addUser = function () {
+  
+  };
+
+  return me;
+}());
+
+Ghost.Ajax = (function () {
 
   var me = {},
       _user;
@@ -130,8 +141,8 @@ Game.Ajax = (function () {
     $.ajax({
       type: "GET",
       dataType: "jsonp",
-      jsonpCallback: "Game.Credentials.setCredentials",
-      url: Game.SERVER_URL + "/user/create",
+      jsonpCallback: "Ghost.Credentials.setCredentials",
+      url: Ghost.SERVER_URL + "/user/create",
       data: formData,
     });
   };
@@ -141,8 +152,8 @@ Game.Ajax = (function () {
     $.ajax({
       type: "GET",
       dataType: "jsonp",
-      jsonpCallback: "Game.Credentials.setCredentials",
-      url: Game.SERVER_URL + "/user/authenticate",
+      jsonpCallback: "Ghost.Credentials.setCredentials",
+      url: Ghost.SERVER_URL + "/user/authenticate",
       data: formData,
     });
   };
@@ -152,33 +163,33 @@ Game.Ajax = (function () {
     $.ajax({
       type: "GET",
       dataType: "jsonp",
-      jsonpCallback: "Game.User.userResponseHandler",
-      url: Game.SERVER_URL + "/user/retrieve",
-      data: {_id: Game.Credentials.getUserId()},
+      jsonpCallback: "Ghost.User.userResponseHandler",
+      url: Ghost.SERVER_URL + "/user/retrieve",
+      data: {_id: Ghost.Credentials.getUserId()},
     });
   };
 
   me.setupEvents = function () {
     // Set up submit handler for creation form
     $('#register-form').submit(function () {
-      Game.Ajax.create($(this).serialize());
+      Ghost.Ajax.create($(this).serialize());
       return false;
     });
     
     // Set up submit handler for login form
     $('#login-form').submit(function () {
-      Game.Ajax.login($(this).serialize());
+      Ghost.Ajax.login($(this).serialize());
       return false;
     });  
   
-      // Set up page handler for Profile page display
+    // Set up page handler for Profile page display
     $('#profile').live('pageshow', function (event){
-      Game.User.viewProfile();
+      Ghost.User.viewProfile();
     });
   
-      // Set up click handler for logout button
+    // Set up click handler for logout button
     $('#logout').click(function () {
-      Game.Credentials.logout();
+      Ghost.Credentials.logout();
     });
   };
 
@@ -186,10 +197,44 @@ Game.Ajax = (function () {
 
 }());
 
+me.Util = function () {
+  var me = {};
+  
+  /**
+   * copy
+   * shallow copy function for objects
+   *
+   * @param {object} obj  object to copy
+   */
+  me.copy = function (obj) {
+    var clone = {};
+    
+    for (var i in obj) {
+      clone[i] = obj[i];
+    }
+    
+    return clone;
+  };
+  
+  /**
+   * create
+   * Crockford's prototypal inheritance method
+   *
+   * @param {object} obj  object to extend
+   */
+  me.create = function (obj) {
+    function F() {}
+    F.prototype = obj;
+    return new F();
+  };
+  
+  return me;
+};
+
 $(function () {
 
-  Game.Ajax.setupEvents();
-  Game.Credentials.checkCredentials();
+  Ghost.Ajax.setupEvents();
+  Ghost.Credentials.checkCredentials();
   
 });
 

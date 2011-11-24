@@ -107,6 +107,31 @@
 	</div><!-- /footer -->
 </div><!-- /page -->
 
+<!-- Start of start private game -->
+<div data-role="page" id="privateStart">
+
+	<div data-role="header">
+		<h1>Start a game</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<h2>Invite some friends</h2>
+		
+		<label>Phone or Email</label>
+		<input type="text" name="current-user" />
+		<input type="submit" class="event_addInvitee" value="Add" />
+		
+		<a id="game-start-private" data-role="button"></a>
+		
+		<a href="#start" data-role="button">Back</a>
+		<a href='#foo' data-role="button">Home</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>(G)(host)</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
 <!-- Start of join game -->
 <div data-role="page" id="join">
 
@@ -152,9 +177,10 @@
 		<h4>G(host)</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
-<script type="text/javascript" src="js/app.js"></script>
-<script>
 
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/ui.js"></script>
+<script>
 </script>
 
 </body>
