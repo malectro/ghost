@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 	<link rel="stylesheet" href="css/main.css" />
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 </head> 
 <body> 
@@ -24,7 +24,8 @@
 		<a href="#start" data-role="button" class="with-profile">Start game!</a>
 		<a href="#join" data-role="button" class="with-profile">Join game!</a>
 		<a href="#continue" data-role="button" class="with-profile">Continue games</a>
-		<a href="#" data-role="button" class="with-profile">View profile/stats</a>
+		<a href="#profile" data-role="button" class="with-profile" id="view-profile">View profile/stats</a>
+		<a href="#foo" data-role="button" class="with-profile" id="logout">Logout</a>
 	</div><!-- /content -->
 
 	<div data-role="footer">
@@ -121,7 +122,7 @@
 			<li><a href="#">Pat - Apparition</a></li>
 			<li><a href="#">Alex - dubGhost</a></li>
 		</ul>
-		<a data-rel="back" data-role="button">Home</a>
+		<a href='#foo' data-role="button">Home</a>
 	</div><!-- /content -->
 
 	<div data-role="footer">
@@ -129,139 +130,236 @@
 	</div><!-- /footer -->
 </div><!-- /page -->
 
-<!--> Start of continue game  -->
-<div data-role="page" id="continue">
+
+<!--> Start of view profile  -->
+<div data-role="page" id="profile">
 	
 	<div data-role="header">
-		<h1>Continue your games</h1>
+		<h1>Your Profile</h1>
 	</div><!-- /header -->
 	
 	<div data-role="content">	
-		<h2>Pick a game to rock</h2>
+		<h4 class="error" id="view-profile-error"></h4>
+		<h2 id="profile-username"></h2>
 		<ul data-role="listview" data-theme="c">
-			<li><a href="#">Game 1</a></li>
-			<li><a href="#">Game 2</a></li>
-			<li><a href="#">Game 3</a></li>
-			<li><a href="#">Game 4</a></li>
+			<li id="profile-email">Email: </li>
+			<li id="profile-phone">Phone: </li>
 		</ul>
-		<a data-rel="back" data-role="button">Home</a>
+		<a href='#foo' data-role="button">Home</a>
 	</div><!-- /content -->
 
 	<div data-role="footer">
 		<h4>G(host)</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
-
-
 <script>
 
-    var Game = {};
+var Game = {};
 
-    (function () {
+(function () {
 	
-	Game.SERVER_URL = 'http://127.0.0.1:1337';
+Game.SERVER_URL = 'http://127.0.0.1:1337';
 
-    Game.Credentials = (function () {
-	
-	  var me = {},
-	           _userId,
-	           _username,
-	           _error;
-	
-	  me.getUserId = function () {
-        return _userId;
-      };
+Game.Credentials = (function () {
 
-	  me.getUsername = function () {
-        return _username;
-      };
+  var me = {},
+           _userId,
+           _username,
+           _error;
 
-	  me.getError = function () {
-        return _error;
-      };
-	
-	  me.checkCredentials = function () {
-		_userId = window.localStorage.getItem('userId');
-		_username = window.localStorage.getItem('username');
-		// If there's not a user ID, only show create/login options.
-	    if(!_userId) {
-	      $('.with-profile').hide();
-	      Game.Ajax.create();
-	      Game.Ajax.login();
-        } else {
-	      // If there is a user ID, show gameplay options.
-	      $('.with-profile').show();
-	      $('.without-profile').hide();
-          // Personalize the page w/ the username.
-	      $('#username').text(_username);
-        }
-	  };
-	
-	  me.setCredentials = function(response) {
-		if(response.e === 0) {
-		  window.localStorage.setItem('userId', response.userId);
-		  window.localStorage.setItem('username', response.username);
-		  window.location = '#foo';
-		  this.checkCredentials();
-		} else {
-		  // If there's a server-side error, show it.
-		  _error = response.msg;
-		  $('.error').hide();
-		  $('#' + response.request + '-error').text(_error).show();
-		}
-	  };
-	
-	  return me;
-	
-	}());
+  me.getUserId = function () {
+    return _userId;
+  };
 
-	
-	Game.Ajax = (function() {
-	
-	  var me = {};
+  me.getUsername = function () {
+    return _username;
+  };
 
-      // Set up submit handler for creation form
-	  me.create = function () {
-		$('#register-form').submit(function() {
-		  $.ajax({
-			type: "GET",
-			dataType: "jsonp",
-			jsonpCallback: "Game.Credentials.setCredentials",
-			url: Game.SERVER_URL + "/user/create",
-			data: $(this).serialize(),
-		  });
-	      return false;
-	    });
-	  };
+  me.getError = function () {
+    return _error;
+  };
 
-      // Set up submit handler for login form
-	  me.login = function () {
-		$('#login-form').submit(function() {
-		  $.ajax({
-			type: "GET",
-			dataType: "jsonp",
-			jsonpCallback: "Game.Credentials.setCredentials",
-			url: Game.SERVER_URL + "/user/authenticate",
-			data: $(this).serialize(),
-		  });
-	      return false;
-	    });
-	  };
+  me.checkCredentials = function () {
 	
-	  return me;
+	_userId = window.localStorage.getItem('userId');
+	_username = window.localStorage.getItem('username');
+	// If there's not a user ID, only show create/login options.
+    if(!_userId) {
+      $('.with-profile').hide();
+      $('.without-profile').show();
+    } else {
+	  // If there is a user ID, show gameplay options.
+      $('.with-profile').show();
+      $('.without-profile').hide();
+      // Personalize the page w/ the username.
+	  $('#username').text(_username);
+    }
+
+  };
+
+  me.setCredentials = function(response) {
 	
-	}());
+	$('.error').hide();
+  	if(response.e === 0) {
+  	  if(response.userId) {
+  	    window.localStorage.setItem('userId', response.userId);
+  	    window.localStorage.setItem('username', response.username);
+  	  } else {
+  		window.localStorage.removeItem('userId');
+  		window.localStorage.removeItem('username');
+  	  }
+  	  window.location = '#foo';
+  	  this.checkCredentials();
+  	} else {
+  	  // If there's a server-side error, show it.
+  	  _error = response.msg;
+  	  $('#' + response.request + '-error').text(_error).show();
+  	}
+  };
+
+  me.logout = function() {
+
+    // Clear out previous user's info
+  	me.setCredentials({e:0});
+  	Game.User.setUser(null);
+    $('#username').text('bro');
+	$('#profile-username').text('');
+	$('#profile-email').text('');
+	$('#profile-phone').text('');
+	$('input:text').val('');
 	
-	$(function () {
-	  Game.Credentials.checkCredentials();
+	window.location = '#foo';
+
+  };
+
+  return me;
+
+}());
+
+
+Game.User = (function() {
+
+  var me = {},
+      _user,
+      _error;
+
+  me.getUser = function () {
+    return _user;
+  };
+
+  me.setUser = function (userObject) {
+    _user = userObject;
+  };
+
+  me.userResponseHandler = function (response) {
+
+	if(response.e === 0) {
+	  this.setUser(response.user);
+	  this.viewProfile();
+	} else {
+	  _error = response.msg;
+	  $('.error').hide();
+	  $('#' + response.request + '-error').text(_error).show();
+	}
+  };
+
+  me.viewProfile = function () {
+	
+	if(_user) {
+	  $('#profile-username').text(_user.username);
+	  $('#profile-email').text('Email: ' + _user.email);
+	  $('#profile-phone').text('Phone: ' + _user.phone);
+	} else {
+	  Game.Ajax.getUserInfo();
+	}
+  };
+
+  return me;
+
+}());
+
+
+Game.Ajax = (function() {
+
+  var me = {},
+      _user;
+
+  me.create = function (formData) {
+	console.log('create');
+	$.ajax({
+	  type: "GET",
+	  dataType: "jsonp",
+	  jsonpCallback: "Game.Credentials.setCredentials",
+	  url: Game.SERVER_URL + "/user/create",
+	  data: formData,
 	});
-	
-	}());
-	
+
+  };
+    
+  me.login = function (formData) {
+	console.log('login');
+    $.ajax({
+	  type: "GET",
+	  dataType: "jsonp",
+	  jsonpCallback: "Game.Credentials.setCredentials",
+	  url: Game.SERVER_URL + "/user/authenticate",
+	  data: formData,
+    });
+
+  };
+
+  me.getUserInfo = function () {
+	console.log('getuserinfo');
+    $.ajax({
+	  type: "GET",
+	  dataType: "jsonp",
+	  jsonpCallback: "Game.User.userResponseHandler",
+	  url: Game.SERVER_URL + "/user/retrieve",
+	  data: {_id: Game.Credentials.getUserId()},
+    });
+
+  };
+
+  me.setupEvents = function () {
+
+	// Set up submit handler for creation form
+	$('#register-form').submit(function() {
+	  Game.Ajax.create($(this).serialize());
+	  return false;
+	});
+  
+	// Set up submit handler for login form
+	$('#login-form').submit(function() {
+	  Game.Ajax.login($(this).serialize());
+	  return false;
+	});	
+
+    // Set up page handler for Profile page display
+    $('#profile').live('pageshow',function(event){
+	  Game.User.viewProfile();
+	});
+
+    // Set up click handler for logout button
+	$('#logout').click(function() {
+      Game.Credentials.logout();
+	});
+
+  };
+
+  return me;
+
+}());
+
+$(function () {
+
+  Game.Ajax.setupEvents();
+  Game.Credentials.checkCredentials();
+
+});
+
+}());
+
 </script>
 
 </body>
-
 </html>
-
-

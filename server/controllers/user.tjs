@@ -130,6 +130,7 @@ exports.authenticate = function (options, callback) {
     this.get(userQuery, defer(query));
   }
 
+  console.log(query);
   if(query.e != 0) {
     return callback({e: 1, request: 'login', msg: 'Username and/or password invalid.'});
   }
@@ -139,10 +140,11 @@ exports.authenticate = function (options, callback) {
   }
   
   if (res) {
-    return callback({e: 0, request: 'login',
-                           msg: 'Authenticated!',
-                           userId: query.user._id,
-                           username: query.user.username});
+    return callback({e: 0, 
+                     request: 'login',
+                     msg: 'Authenticated!',
+                     userId: query.user._id,
+                     username: query.user.username});
   } else {
     return callback({e: 1, request: 'login', msg: 'Username and/or password invalid.'});
   }
@@ -150,6 +152,39 @@ exports.authenticate = function (options, callback) {
 };
 
 
+/**
+ * A function to retrieve client-safe user Info (no login credentials).
+ */
+exports.retrieve = function (options, callback) {
+
+  var userQuery = {_id: options._id},
+      scrubbedUser = {},
+      safeFields = ['_id','username','email','phone'];
+  
+  await {
+    this.get(userQuery, defer(query));
+  }
+  
+  if(query.e != 0) {
+    return callback({e: 1, request: 'view-profile', msg: query.msg});
+  }
+  
+  console.log(query.user);
+  
+  for(var i in safeFields) {
+    var field = safeFields[i];
+    scrubbedUser[field] = query.user[field];
+  }
+  
+  console.log(scrubbedUser);
+  return callback({e:0,
+                   request: 'view-profile',
+                   user: scrubbedUser});
+  
+};
+
+//TODO(dbow): Need to protect this function somehow so only functions within
+//   this module can access it (so we don't expose login credentials).
 exports.get = function (options, callback) {
   var user = defaults({
     _id: null,
@@ -173,6 +208,12 @@ exports.get = function (options, callback) {
   await {
     db.getCollection('users', defer(users, client));
   }
+  
+  if (user._id) {
+    var bsonId = new client.bson_serializer.ObjectID(user._id);
+    user._id = bsonId;
+  }
+  
   await {
     users.find(user).toArray(defer(e, list));
   }
