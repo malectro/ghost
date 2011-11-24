@@ -34,15 +34,13 @@ exports.create = function (options, callback) {
       e,
       results,
       firstPlayer,
-      playerList,
-      playerString = options['players'];
+      playerList = options['players'];
   
-  if (!playerString) {
+  if (!playerList) {
     return callback({e: 1, msg: 'Must specify players in ' +
                                 'players=userid1,userid2 format'});
   }
   
-  playerList = playerString.split(',');
   firstPlayer = playerList[0];
   
   var newGame = {

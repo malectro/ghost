@@ -11,12 +11,12 @@ Ghost.UI = (function () {
   me.init = function () {
     //load templates 
     $('.tmpl').each(function () {
-      _templates[this.title] = this.innerHTML;
+      _templates[this.title] = this.innerHTML.trim();
     });
   };
   
   me.render = function (tmpl, context) {
-    Mustache.to_html(_templates[tmpl], context);
+    return Mustache.to_html(_templates[tmpl], context);
   };
   
   return me;
@@ -58,18 +58,29 @@ Ghost.UI.Start = (function () {
   me = Ghost.Util.create(Ghost.UI.Module);
   
   me.register('click', 'addInvitee', function () {
-    var el = $(this),
+    var el = $('.start_invite_field'),
         val = el.val();
         
     Ghost.Game.addInvitee(val);
   });
+  
+  me.register('click', 'startGame', function () {
+    Ghost.Game.start();
+  });
+  
+  me.clear = function () {
+    $('.start_invite_field').val('');
+    $('.start_msg').html('');
+    $('.start_invitees').html('');
+  };
   
   me.errorInvitee = function (msg) {
     $('.start_msg').html(msg);
   };
   
   me.listInvitee = function (name) {
-    $('.start_msg').val('');
+    $('.start_invite_field').val('');
+    $('.start_msg').html('');
     $('.start_invitees').append(
       me.render('start_invitee', {name: name})
     );

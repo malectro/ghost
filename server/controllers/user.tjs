@@ -157,7 +157,7 @@ exports.authenticate = function (options, callback) {
  */
 exports.retrieve = function (options, callback) {
 
-  var userQuery = {_id: options._id},
+  var userQuery = options,
       scrubbedUser = {},
       safeFields = ['_id','username','email','phone'];
   

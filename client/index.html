@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 	<script type="text/javascript" src="js/lib/mustache.js"></script>
+	<script type="text/javascript" src="js/lib/underscore-min.js"></script>
 </head> 
 <body> 
 
@@ -121,12 +122,12 @@
 		<h2>Invite some friends</h2>
 		
 		<label>Phone or Email</label>
-		<input type="text" name="current-user" />
+		<input type="text" class="start_invite_field" name="current-user" />
 		<input type="submit" class="event_addInvitee" value="Add" />
 		<div class="start_msg"></div>
 		<div class="start_invitees"></div>
 		
-		<a id="game-start-private" data-role="button"></a>
+		<a class="event_startGame" data-role="button">Start</a>
 		
 		<a href="#start" data-role="button">Back</a>
 		<a href='#foo' data-role="button">Home</a>

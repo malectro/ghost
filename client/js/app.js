@@ -124,7 +124,7 @@ Ghost.User = (function () {
     });
   };
   
-  me.getByEmailOrPhone = function (emailOrPhone) {
+  me.getByEmailOrPhone = function (emailOrPhone, callback) {
     var getter = {};
     
     emailOrPhone = emailOrPhone.trim();
@@ -136,12 +136,10 @@ Ghost.User = (function () {
       getter.email = emailOrPhone;
     }
     else {
-      return Ghost.UI.Start.errorInvite('Not a valid email address or phone number');
+      return Ghost.UI.Start.errorInvitee('Not a valid email address or phone number');
     }
     
-    me.get(getter, function (user) {
-    
-    });
+    me.get(getter, callback);
   };
   
   me.isPhone = function (number) {
@@ -157,9 +155,38 @@ Ghost.User = (function () {
 }());
 
 Ghost.Game = (function () {
-  var me = {};
+  var me = {},
+  
+      _invitees = [];
 
   me.addInvitee = function (emailOrPhone) {
+    Ghost.User.getByEmailOrPhone(emailOrPhone, function (resp) {
+      if (resp.e) {
+        Ghost.UI.Start.errorInvitee('Sorry, that user has not signed up!');
+      }
+      else {
+        _invitees.push(resp.user);
+        Ghost.UI.Start.listInvitee(resp.user.username);
+      }
+    });
+  };
+  
+  me.start = function () {
+    if (!_invitees.length) {
+      return Ghost.UI.Start.errorInvitee('Select at least one friend to start a game.');
+    }
+
+    var ids = _.map(_invitees, function (user) {
+      return user._id;
+    });
+    
+    Ghost.Ajax.get('/game/create', {
+      data: {players: _ids},
+      success: me.begin
+    });
+  };
+  
+  me.begin = function (game) {
   
   };
 
@@ -284,6 +311,7 @@ $(function () {
 
   Ghost.Ajax.setupEvents();
   Ghost.Credentials.checkCredentials();
+  Ghost.UI.init();
   
 });
 
