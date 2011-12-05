@@ -4,8 +4,6 @@ var Ghost = {};
   
 Ghost.SERVER_URL = 'http://127.0.0.1:1337';
 
-Ghost.UI = {};
-
 Ghost.Credentials = (function () {
 
   var me = {},
@@ -157,7 +155,15 @@ Ghost.User = (function () {
 Ghost.Game = (function () {
   var me = {},
   
-      _invitees = [];
+      _invitees = [],
+      _currentGame;
+      
+  me.get = function (params, callback) {
+    Ghost.Ajax.get('/game/get', {
+      data: params,
+      success: callback
+    });
+  };
 
   me.addInvitee = function (emailOrPhone) {
     Ghost.User.getByEmailOrPhone(emailOrPhone, function (resp) {
@@ -181,13 +187,34 @@ Ghost.Game = (function () {
     });
     
     Ghost.Ajax.get('/game/create', {
-      data: {players: _ids},
-      success: me.begin
+      data: {players: ids},
+      success: me.load
     });
   };
   
-  me.begin = function (game) {
+  me.load = function (game) {
+    if (typeof game === 'string') {
+      return me.get({gameid: game}, function (result) {
+        me.load(result.game);
+      });
+    }
   
+    _currentGame = game;
+    Ghost.UI.Game.load(game);
+  };
+  
+  me.getList = function (uid, callback) {
+    uid = uid || Ghost.Credentials.getUserId();
+    
+    me.get({userid: uid}, callback);
+  };
+  
+  me.play = function (letter) {
+    console.log({letter: letter, gameid: _currentGame._id});
+    Ghost.Ajax.get('/game/play', {
+      data: {letter: letter, gameid: _currentGame._id},
+      success: me.load
+    });
   };
 
   return me;
@@ -206,8 +233,11 @@ Ghost.Ajax = (function () {
     options = $.extend({
       type: 'GET',
       dataType: 'jsonp',
+      data: {},
       url: Ghost.SERVER_URL + cmd
     }, {}, options);
+    
+    options.data.currentUser = Ghost.Credentials.getUserId();
     
     $.ajax(options);
   };

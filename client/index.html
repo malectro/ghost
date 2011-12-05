@@ -27,7 +27,7 @@
 		<a href="#login" data-role="button" class="without-profile">Login</a>
 		<a href="#start" data-role="button" class="with-profile">Start game!</a>
 		<a href="#join" data-role="button" class="with-profile">Join game!</a>
-		<a href="#continue" data-role="button" class="with-profile">Continue games</a>
+		<a href="#continue" data-role="button" class="with-profile event_listGames">Continue games</a>
 		<a href="#profile" data-role="button" class="with-profile" id="view-profile">View profile/stats</a>
 		<a href="#foo" data-role="button" class="with-profile" id="logout">Logout</a>
 	</div><!-- /content -->
@@ -187,6 +187,38 @@
 		<h4>G(host)</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
+
+<!--> Start of game list  -->
+<div data-role="page" id="continue">
+	
+	<div data-role="header">
+		<h1>Your Games</h1>
+	</div><!-- /header -->
+	
+	<div data-role="content">	
+		<ul id="continue-list" data-role="listview" data-theme="c">
+		</ul>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>G(host)</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<div class="tmpl" title="continue_list">
+  <li class="event_continueGame">{{game}}</li>
+</div>
+
+
+<!--> Start of Game Page -->
+<div data-role="page" id="game">
+  <div id="game-string-container">
+    <span id="game-string">abu</span><input type="text" id="game-input" class="event_changeLetter" />
+  </div>
+  
+  <div data-role="button">Challenge</div>
+  <div href="#foo" data-role="button">Home</div>
+</div>
 
 <script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="js/ui.js"></script>

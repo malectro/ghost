@@ -88,3 +88,66 @@ Ghost.UI.Start = (function () {
   
   return me;
 }());
+
+/**
+ * 
+ */
+Ghost.UI.GameList = (function () {
+  var me = Ghost.Util.create(Ghost.UI.Module),
+  
+      _games = [];
+  
+  me.register('click', 'listGames', function () {
+    Ghost.Game.getList(null, _showGames)
+  });
+  
+  me.register('click', 'continueGame', function () {
+    $('#game-input').focus();
+    Ghost.Game.load(this.innerHTML);
+  });
+  
+  function _showGames(games) {
+    var html = '';
+  
+    _games = games.games;
+    
+    for (var i = 0; i < _games.length; i++) {
+      html += me.render('continue_list', {game: _games[0]._id});
+    }
+    
+    $('#continue-list').html(html);
+  }
+  
+  return me;
+}());
+
+/**
+ * UI.Game
+ * This will probably need to be split up once it starts
+ * getting really large.
+ */
+Ghost.UI.Game = (function () {
+  var me = Ghost.Util.create(Ghost.UI.Module);
+  
+  me.register('keydown', 'changeLetter', function (e) {
+    if (event.which === 13 && this.value != '') {
+      Ghost.Game.play(this.value);
+    }
+    else if (event.which > 64 && event.which < 91) {
+      this.value = '';
+    }
+    else {
+      e.preventDefault();
+    }
+  });
+
+  me.load = function (game) {
+    console.log(game);
+    
+    location.hash = '#game';
+    $('#game-string').text(game.letters);
+    $('#game-input').focus();
+  };
+
+  return me;
+}());
