@@ -115,7 +115,8 @@ Ghost.User = (function () {
  */
 Ghost.Game = (function () {
   var me = {},
-      _invitees = [];
+      _invitees = [],
+      _currentGame;
 
   me.addInvitee = function (emailOrPhone) {
     me.getByEmailOrPhone(emailOrPhone, function (resp) {
@@ -158,6 +159,13 @@ Ghost.Game = (function () {
   me.isEmail = function (email) {
     return /^[a-zA-Z0-9\+\._]+@[a-zA-Z0-9_]+\.[a-z]+$/.test(email);
   };
+      
+  me.get = function (params, callback) {
+    Ghost.Ajax.get('/game/get', {
+      data: params,
+      success: callback
+    });
+  };
   
   me.start = function () {
     
@@ -169,15 +177,39 @@ Ghost.Game = (function () {
 
     ids = _.pluck(_invitees, '_id');
     
+    // Make sure creator is included in players list.
+    ids.push(Ghost.Credentials.getUserId());
+    
     Ghost.Ajax.get('/game/create', {
       data: {players: ids},
-      success: me.begin
+      success: me.load
     });
   
   };
   
-  me.begin = function (game) {
-    console.log(game);
+  me.load = function (game) {
+    if (typeof game === 'string') {
+      return me.get({gameid: game}, function (result) {
+        me.load(result.game);
+      });
+    }
+  
+    _currentGame = game;
+    Ghost.UI.Game.load(game);
+  };
+  
+  me.getList = function (uid, callback) {
+    uid = uid || Ghost.Credentials.getUserId();
+    
+    me.get({userid: uid}, callback);
+  };
+  
+  me.play = function (letter) {
+    console.log({letter: letter, gameid: _currentGame._id});
+    Ghost.Ajax.get('/game/play', {
+      data: {letter: letter, gameid: _currentGame._id},
+      success: me.load
+    });
   };
 
   return me;
@@ -200,8 +232,11 @@ Ghost.Ajax = (function () {
     options = $.extend({
       type: 'GET',
       dataType: 'jsonp',
+      data: {},
       url: Ghost.SERVER_URL + cmd
     }, {}, options);
+    
+    options.data.currentUser = Ghost.Credentials.getUserId();
     
     $.ajax(options);
   };

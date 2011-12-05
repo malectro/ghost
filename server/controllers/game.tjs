@@ -64,7 +64,7 @@ exports.create = function (options, callback) {
   if (e) {
     return callback({e: 2, msg: e});
   } else {
-    return callback({e: 0, msg: 'Success'});
+    return callback({e: 0, msg: 'Success', game: results[0]});
   }
 
 };
@@ -131,5 +131,11 @@ exports.get = function (options, callback) {
     }
     
     client.close();
+  }
+};
+
+exports.play = function (options, callback) {
+  await {
+    this.get({gameid: options.gameid}, defer(e, game));
   }
 };
