@@ -4,8 +4,6 @@ var Ghost = {};
   
 Ghost.SERVER_URL = 'http://127.0.0.1:1337';
 
-Ghost.UI = {};
-
 Ghost.Credentials = (function () {
 
   var me = {},
@@ -39,6 +37,7 @@ Ghost.Credentials = (function () {
       $('.without-profile').hide();
       // Personalize the page w/ the username.
       $('#username').text(_username);
+      Ghost.User.getProfileInfo();
     }
   };
 
@@ -53,9 +52,9 @@ Ghost.Credentials = (function () {
         window.localStorage.removeItem('userId');
         window.localStorage.removeItem('username');
       }
-      
+
       window.location = '#foo';
-      this.checkCredentials();
+      me.checkCredentials();
     } else {
       // If there's a server-side error, show it.
       _error = response.msg;
@@ -85,8 +84,7 @@ Ghost.Credentials = (function () {
 Ghost.User = (function () {
 
   var me = {},
-      _user,
-      _error;
+      _user;
 
   me.getUser = function () {
     return _user;
@@ -98,31 +96,19 @@ Ghost.User = (function () {
 
   me.userResponseHandler = function (response) {
     if (response.e === 0) {
-      this.setUser(response.user);
-      this.viewProfile();
+      me.setUser(response.user);
+      Ghost.UI.Profile.viewProfile();
     } else {
-      _error = response.msg;
-      $('.error').hide();
-      $('#' + response.request + '-error').text(_error).show();
-    }
-  };
-
-  me.viewProfile = function () {
-    if(_user) {
-      $('#profile-username').text(_user.username);
-      $('#profile-email').text('Email: ' + _user.email);
-      $('#profile-phone').text('Phone: ' + _user.phone);
-    } else {
-      Ghost.Ajax.getUserInfo();
+      Ghost.UI.Profile.showError(response);
     }
   };
   
-  me.get = function (getter, callback) {
+  me.getProfileInfo = function () {
     Ghost.Ajax.get('/user/retrieve', {
-      data: getter,
-      success: callback
+      data: {_id: Ghost.Credentials.getUserId()},
+      success: Ghost.User.userResponseHandler
     });
-  };
+  }
   
   me.getByEmailOrPhone = function (emailOrPhone, callback) {
     var getter = {};
@@ -139,7 +125,11 @@ Ghost.User = (function () {
       return Ghost.UI.Start.errorInvitee('Not a valid email address or phone number');
     }
     
-    me.get(getter, callback);
+    Ghost.Ajax.get('/user/retrieve', {
+      data: getter,
+      success: callback
+    });
+
   };
   
   me.isPhone = function (number) {
@@ -156,7 +146,6 @@ Ghost.User = (function () {
 
 Ghost.Game = (function () {
   var me = {},
-  
       _invitees = [];
 
   me.addInvitee = function (emailOrPhone) {
@@ -172,22 +161,24 @@ Ghost.Game = (function () {
   };
   
   me.start = function () {
+    
+    var ids;
+    
     if (!_invitees.length) {
       return Ghost.UI.Start.errorInvitee('Select at least one friend to start a game.');
     }
 
-    var ids = _.map(_invitees, function (user) {
-      return user._id;
-    });
+    ids = _.pluck(_invitees, '_id');
     
     Ghost.Ajax.get('/game/create', {
-      data: {players: _ids},
+      data: {players: ids},
       success: me.begin
     });
+  
   };
   
   me.begin = function (game) {
-  
+    console.log(game);
   };
 
   return me;
@@ -195,8 +186,7 @@ Ghost.Game = (function () {
 
 Ghost.Ajax = (function () {
 
-  var me = {},
-      _user;
+  var me = {};
   
   /**
    * Ajax.get
@@ -212,55 +202,28 @@ Ghost.Ajax = (function () {
     $.ajax(options);
   };
 
-  me.create = function (formData) {
-    console.log('create');
-    $.ajax({
-      type: "GET",
-      dataType: "jsonp",
-      jsonpCallback: "Ghost.Credentials.setCredentials",
-      url: Ghost.SERVER_URL + "/user/create",
-      data: formData,
-    });
-  };
-    
-  me.login = function (formData) {
-    console.log('login');
-    $.ajax({
-      type: "GET",
-      dataType: "jsonp",
-      jsonpCallback: "Ghost.Credentials.setCredentials",
-      url: Ghost.SERVER_URL + "/user/authenticate",
-      data: formData,
-    });
-  };
-
-  me.getUserInfo = function () {
-    console.log('getuserinfo');
-    $.ajax({
-      type: "GET",
-      dataType: "jsonp",
-      jsonpCallback: "Ghost.User.userResponseHandler",
-      url: Ghost.SERVER_URL + "/user/retrieve",
-      data: {_id: Ghost.Credentials.getUserId()},
-    });
-  };
-
   me.setupEvents = function () {
     // Set up submit handler for creation form
     $('#register-form').submit(function () {
-      Ghost.Ajax.create($(this).serialize());
+      Ghost.Ajax.get('/user/create', {
+        data: $(this).serialize(),
+        success: Ghost.Credentials.setCredentials
+      });
       return false;
     });
     
     // Set up submit handler for login form
     $('#login-form').submit(function () {
-      Ghost.Ajax.login($(this).serialize());
+      Ghost.Ajax.get('/user/authenticate', {
+        data: $(this).serialize(),
+        success: Ghost.Credentials.setCredentials
+      });
       return false;
     });  
   
     // Set up page handler for Profile page display
     $('#profile').live('pageshow', function (event){
-      Ghost.User.viewProfile();
+      Ghost.User.getProfileInfo();
     });
   
     // Set up click handler for logout button
@@ -305,6 +268,7 @@ Ghost.Util = (function () {
   };
   
   return me;
+
 }());
 
 $(function () {

@@ -88,3 +88,30 @@ Ghost.UI.Start = (function () {
   
   return me;
 }());
+
+
+/**
+ * UI.Profile
+ * 
+ */
+Ghost.UI.Profile = (function () {
+  
+  me = Ghost.Util.create(Ghost.UI.Module);
+
+  me.viewProfile = function () {
+    var user = Ghost.User.getUser();
+    if(user) {
+      $('#view_name').html(me.render('profile_name', {name: user.username}));
+      $('#view_email').html(me.render('profile_email', {email: user.email}));
+      $('#view_phone').html(me.render('profile_phone', {phone: user.phone}));
+    }
+  };
+  
+  me.showError = function (response) {
+    $('.error').hide();
+    $('#' + response.request + '-error').text(response.msg).show();
+  }
+  
+  return me;
+}());
+

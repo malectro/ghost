@@ -54,7 +54,8 @@
 		  Email: <input type="text" name="email" />
 		  Phone: <input type="text" name="phone" />
 	      <input type="submit" value="Create profile" />
-        </form>	
+        </form>
+        <a href="#login" data-role="button">Already registered?  Log in!</a>
 		<a href='#foo' data-role="button">Home</a>
 	</div><!-- /content -->
 
@@ -173,14 +174,14 @@
 		<h1>Your Profile</h1>
 	</div><!-- /header -->
 	
-	<div data-role="content">	
-		<h4 class="error" id="view-profile-error"></h4>
-		<h2 id="profile-username"></h2>
-		<ul data-role="listview" data-theme="c">
-			<li id="profile-email">Email: </li>
-			<li id="profile-phone">Phone: </li>
-		</ul>
-		<a href='#foo' data-role="button">Home</a>
+	<div data-role="content">
+	  <h4 class="error" id="view-profile-error"></h4>
+	  <h2 id="view_name"></h2>
+	  <ul data-role="listview" data-theme="c">
+	    <li id="view_email"></li>
+	    <li id="view_phone"></li>
+	  </ul>
+	  <a href='#foo' data-role="button">Home</a>
 	</div><!-- /content -->
 
 	<div data-role="footer">
@@ -188,10 +189,18 @@
 	</div><!-- /footer -->
 </div><!-- /page -->
 
+<div class="tmpl" title="profile_name">
+  {{name}}
+</div>
+<div class="tmpl" title="profile_email">
+  Email: {{email}}
+</div>
+<div class="tmpl" title="profile_phone">
+  Phone: {{phone}}
+</div>
+
 <script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="js/ui.js"></script>
-<script>
-</script>
 
 </body>
 </html>
