@@ -29,7 +29,7 @@
 		<a href="#join" data-role="button" class="with-profile">Join game!</a>
 		<a href="#continue" data-role="button" class="with-profile">Continue games</a>
 		<a href="#profile" data-role="button" class="with-profile" id="view-profile">View profile/stats</a>
-		<a href="#foo" data-role="button" class="with-profile" id="logout">Logout</a>
+		<a href="#foo" data-role="button" class="with-profile event_logout">Logout</a>
 	</div><!-- /content -->
 
 	<div data-role="footer">
@@ -48,7 +48,7 @@
 	<div data-role="content">	
 		<h2>Fill this shit out yo</h2>
 		<h4 class="error" id="create-error"></h4>
-        <form action="" method="get" id="register-form">
+        <form action="" method="get" class="event_register">
 	      Username: <input type="text" name="username" />
 	      Password: <input type="text" name="password" />
 		  Email: <input type="text" name="email" />
@@ -75,7 +75,7 @@
 	<div data-role="content">	
 		<h2>Fill this shit out yo</h2>
 		<h4 class="error" id="login-error"></h4>
-        <form action="" method="get" id="login-form">
+        <form class="event_login">
 	      Username: <input type="text" name="username" />
 	      Password: <input type="text" name="password" />
 	      <input type="submit" value="Login" />
@@ -168,7 +168,7 @@
 
 
 <!--> Start of view profile  -->
-<div data-role="page" id="profile">
+<div data-role="page" id="profile" class="event_profile">
 	
 	<div data-role="header">
 		<h1>Your Profile</h1>

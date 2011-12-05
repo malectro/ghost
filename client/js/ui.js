@@ -22,6 +22,7 @@ Ghost.UI = (function () {
   return me;
 }());
 
+
 /**
  * UI.Module
  * All UI modules should extend this module. Provides basic event handling.
@@ -37,7 +38,8 @@ Ghost.UI.Module = (function () {
    */
   me.register = function (event, funcName, func) {
     this['event_' + funcName] = func;
-    $('.event_' + funcName).live(event, func);
+    $('.event_' + funcName).on(event, func);
+
   };
   
   /**
@@ -50,9 +52,10 @@ Ghost.UI.Module = (function () {
   return me;
 }());
 
+
 /**
  * UI.Start
- * 
+ * Object that handles UI updates for game creation.
  */
 Ghost.UI.Start = (function () {
   me = Ghost.Util.create(Ghost.UI.Module);
@@ -92,13 +95,17 @@ Ghost.UI.Start = (function () {
 
 /**
  * UI.Profile
- * 
+ * Object that handles UI updates related to the user profile.
  */
 Ghost.UI.Profile = (function () {
   
   me = Ghost.Util.create(Ghost.UI.Module);
+  
+  me.register('pageshow', 'profile', function () {
+    Ghost.User.getProfileInfo();
+  });
 
-  me.viewProfile = function () {
+  me.updateProfile = function () {
     var user = Ghost.User.getUser();
     if(user) {
       $('#view_name').html(me.render('profile_name', {name: user.username}));
@@ -115,3 +122,86 @@ Ghost.UI.Profile = (function () {
   return me;
 }());
 
+
+/**
+ * UI.Register
+ * Object that handles the UI during user creation.
+ */
+Ghost.UI.Register = (function () {
+  
+  me = Ghost.Util.create(Ghost.UI.Module);
+  
+  me.register('submit', 'register', function () {
+    Ghost.Ajax.get('/user/create', {
+      data: $(this).serialize(),
+      success: Ghost.Credentials.setCredentials
+    });
+    return false;
+  });
+  
+  return me;
+}());
+
+
+/**
+ * UI.Login
+ * Object that handles the UI during Login
+ */
+Ghost.UI.Login = (function () {
+  
+  me = Ghost.Util.create(Ghost.UI.Module);
+  
+  me.register('submit', 'login', function () {
+    Ghost.Ajax.get('/user/authenticate', {
+      data: $(this).serialize(),
+      success: Ghost.Credentials.setCredentials
+    });
+    return false;
+  });
+  
+  me.show = function() {
+    $('.with-profile').hide();
+    $('.without-profile').show();
+  };
+  
+  me.hide = function() {
+    $('.with-profile').show();
+    $('.without-profile').hide();
+  };
+  
+  me.showUsername = function () {
+    var username = Ghost.Credentials.getUsername();
+    $('#username').text(username);
+  };
+  
+  me.showError = function(response) {
+    $('.error').hide();
+    $('#' + response.request + '-error').text(response.msg).show();
+  };
+  
+  return me;
+}());
+
+
+/**
+ * UI.Logout
+ * Object that handles the UI during logout.
+ */
+Ghost.UI.Logout = (function () {
+  
+  me = Ghost.Util.create(Ghost.UI.Module);
+  
+  me.register('click', 'logout', function () {
+    Ghost.Credentials.logout();
+  });
+  
+  me.clearProfileInfo = function () {
+    $('#username').text('bro');
+    $('#profile-username').text('');
+    $('#profile-email').text('');
+    $('#profile-phone').text('');
+    $('input:text').val('');
+  };
+  
+  return me;
+}());
