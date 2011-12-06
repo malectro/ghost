@@ -168,10 +168,32 @@ Ghost.UI.Profile = (function () {
   me.register('pageshow', 'profile', function () {
     Ghost.User.getProfileInfo();
   });
+  
+  me.register('pageshow', 'edit_profile', function () {
+    var user = Ghost.User.getUser(),
+        editForm = $('#edit_profile_form').children('input');
+    for (i=0; i < editForm.length; i++) {
+      var input = editForm[i];
+      if (input.name === '_id') {
+        input.value = Ghost.Credentials.getUserId();
+      } else {
+        input.value = user[input.name];
+      }
+    }
+  });
+  
+  me.register('submit', 'edit_profile_submit', function () {
+    Ghost.Ajax.get('/user/edit', {
+      data: $(this).serialize(),
+      success: Ghost.User.userResponseHandler
+    });
+    return false;
+  });
 
   me.updateProfile = function () {
     var user = Ghost.User.getUser();
     if(user) {
+      $('#username').text(user.username);
       $('#view_name').html(me.render('profile_name', {name: user.username}));
       $('#view_email').html(me.render('profile_email', {email: user.email}));
       $('#view_phone').html(me.render('profile_phone', {phone: user.phone}));
@@ -231,11 +253,6 @@ Ghost.UI.Login = (function () {
   me.hide = function() {
     $('.with-profile').show();
     $('.without-profile').hide();
-  };
-  
-  me.showUsername = function () {
-    var username = Ghost.Credentials.getUsername();
-    $('#username').text(username);
   };
   
   me.showError = function(response) {

@@ -20,6 +20,22 @@ function validateEmail(email) {
 
 
 /**
+ * Returns an object with only the user fields listed in safeFields.
+ */
+function scrubUser (user) {
+  var scrubbedUser = {},
+      safeFields = ['_id','username','email','phone'];
+
+  for(var i in safeFields) {
+    var field = safeFields[i];
+    scrubbedUser[field] = user[field];
+  }
+  
+  return scrubbedUser;
+}
+
+
+/**
  * Creates an object from the provided defaults and given objects.
  * Uses given values when provided, else default values.
  * @param {object} defaults
@@ -199,8 +215,7 @@ exports.create = function (options, callback) {
   client.close();
   return callback({e: 0,
                    request: 'create',
-                   userId: storedUser[0]._id,
-                   username: storedUser[0].username});
+                   userId: storedUser[0]._id});
 };
 
 
@@ -231,8 +246,7 @@ exports.authenticate = function (options, callback) {
     return callback({e: 0, 
                      request: 'login',
                      msg: 'Authenticated!',
-                     userId: query.user._id,
-                     username: query.user.username});
+                     userId: query.user._id});
   } else {
     return callback({e: 1, request: 'login', msg: 'Username and/or password invalid.'});
   }
@@ -249,8 +263,7 @@ exports.authenticate = function (options, callback) {
 exports.retrieve = function (options, callback) {
 
   var userQuery = options,
-      scrubbedUser = {},
-      safeFields = ['_id','username','email','phone'];
+      scrubbedUser;
   
   await {
     get(userQuery, defer(query));
@@ -260,13 +273,63 @@ exports.retrieve = function (options, callback) {
     return callback({e: 1, request: 'view-profile', msg: query.msg});
   }
   
-  for(var i in safeFields) {
-    var field = safeFields[i];
-    scrubbedUser[field] = query.user[field];
-  }
+  scrubbedUser = scrubUser(query.user);
   
   return callback({e:0,
                    request: 'view-profile',
+                   user: scrubbedUser});
+  
+};
+
+
+/**
+ * user.edit
+ * Retrieves a user object based on provided _id and updates that object
+ * with fields provided in options.
+ */
+exports.edit = function (options, callback) {
+  
+  var queryObject = {_id: options._id},
+      updateFields = ['username','email','phone'],
+      user,
+      update = false;
+  
+  await {
+    get(queryObject, defer(queryResult));
+  }
+
+  if(queryResult.e != 0) {
+    return callback({e: 1, request: 'edit-profile', msg: query.msg});
+  }
+  
+  user = queryResult.user;
+
+  for (var i in updateFields) {
+    var field = updateFields[i];
+    if(user[field] != options[field]) {
+      user[field] = options[field];
+      update = true;
+    }
+  }
+  
+  if (update) {
+    console.log('update');
+    await {
+      db.getCollection('users', defer(users, client));
+    }
+    await {
+      console.log(user);
+      users.update({_id: user._id}, user);
+    }
+  }
+    
+  scrubbedUser = scrubUser(user);
+  console.log(user);
+  
+  client.close();
+  
+  return callback({e:0,
+                   request: 'edit-profile',
                    user: scrubbedUser});
   
 };

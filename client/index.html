@@ -180,6 +180,7 @@
 	    <li id="view_email"></li>
 	    <li id="view_phone"></li>
 	  </ul>
+	  <a href='#edit_profile' data-role="button">Edit your profile</a>
 	  <a href='#foo' data-role="button">Home</a>
 	</div><!-- /content -->
 
@@ -197,6 +198,33 @@
 <div class="tmpl" title="profile_phone">
   Phone: {{phone}}
 </div>
+
+
+<!-- Start of edit profile -->
+<div data-role="page" id="edit_profile" class="event_edit_profile">
+
+	<div data-role="header">
+		<h1>Edit your profile, human.</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<h2>Update this shit out yo</h2>
+		<h4 class="error" id="edit-error"></h4>
+        <form action="" method="get" class="event_edit_profile_submit" id="edit_profile_form">
+	      Username: <input type="text" name="username" />
+		  Email: <input type="text" name="email" />
+		  Phone: <input type="text" name="phone" />
+		  <input type="hidden" name="_id" />
+	      <input type="submit" value="Edit profile" />
+        </form>
+		<a href='#foo' data-role="button">Home</a>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>(G)(host)</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
 
 
 <!--> Start of game list  -->

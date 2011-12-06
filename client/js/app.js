@@ -11,20 +11,14 @@ Ghost.SERVER_URL = 'http://127.0.0.1:1337';
 Ghost.Credentials = (function () {
 
   var me = {},
-           _userId,
-           _username;
+           _userId;
 
   me.getUserId = function () {
     return _userId;
   };
 
-  me.getUsername = function () {
-    return _username;
-  };
-
   me.checkCredentials = function () {
     _userId = window.localStorage.getItem('userId');
-    _username = window.localStorage.getItem('username');
     
     // If there's not a user ID, only show create/login options.
     if(!_userId) {
@@ -32,7 +26,6 @@ Ghost.Credentials = (function () {
     } else {
       // If there is a user ID, show gameplay options and personalize page.
       Ghost.UI.Login.hide();
-      Ghost.UI.Login.showUsername();
       Ghost.User.getProfileInfo();
     }
   };
@@ -42,7 +35,6 @@ Ghost.Credentials = (function () {
     if (response.e === 0) {
       if (response.userId) {
         window.localStorage.setItem('userId', response.userId);
-        window.localStorage.setItem('username', response.username);
       }
       window.location = '#foo';
       me.checkCredentials();
@@ -54,7 +46,6 @@ Ghost.Credentials = (function () {
   
   var clearCredentials = function () {
     window.localStorage.removeItem('userId');
-    window.localStorage.removeItem('username');
   };
 
   me.logout = function () {
@@ -92,6 +83,9 @@ Ghost.User = (function () {
     if (response.e === 0) {
       me.setUser(response.user);
       Ghost.UI.Profile.updateProfile();
+      if (window.location.hash === '#edit_profile') {
+        window.location = '#profile';
+      }
     } else {
       Ghost.UI.Profile.showError(response);
     }
