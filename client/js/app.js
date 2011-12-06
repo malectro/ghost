@@ -121,11 +121,11 @@ Ghost.Game = (function () {
   me.addInvitee = function (emailOrPhone) {
     me.getByEmailOrPhone(emailOrPhone, function (resp) {
       if (resp.e) {
-        Ghost.UI.Start.errorInvitee('Sorry, that user has not signed up!');
+        Ghost.UI.GameStart.errorInvitee('Sorry, that user has not signed up!');
       }
       else {
         _invitees.push(resp.user);
-        Ghost.UI.Start.listInvitee(resp.user.username);
+        Ghost.UI.GameStart.listInvitee(resp.user.username);
       }
     });
   };
@@ -142,7 +142,7 @@ Ghost.Game = (function () {
       getter.email = emailOrPhone;
     }
     else {
-      return Ghost.UI.Start.errorInvitee('Not a valid email address or phone number');
+      return Ghost.UI.GameStart.errorInvitee('Not a valid email address or phone number');
     }
     
     Ghost.Ajax.get('/user/retrieve', {
@@ -172,7 +172,7 @@ Ghost.Game = (function () {
     var ids;
     
     if (!_invitees.length) {
-      return Ghost.UI.Start.errorInvitee('Select at least one friend to start a game.');
+      return Ghost.UI.GameStart.errorInvitee('Select at least one friend to start a game.');
     }
 
     ids = _.pluck(_invitees, '_id');
@@ -184,7 +184,6 @@ Ghost.Game = (function () {
       data: {players: ids},
       success: me.load
     });
-  
   };
   
   me.load = function (game) {
@@ -257,7 +256,6 @@ Ghost.Util = (function () {
   /**
    * copy
    * shallow copy function for objects
-   *
    * @param {object} obj  object to copy
    */
   me.copy = function (obj) {
@@ -273,7 +271,6 @@ Ghost.Util = (function () {
   /**
    * create
    * Crockford's prototypal inheritance method
-   *
    * @param {object} obj  object to extend
    */
   me.create = function (obj) {

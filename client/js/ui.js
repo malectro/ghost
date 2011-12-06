@@ -2,7 +2,6 @@
  * UI
  * UI namespace
  */
-
 Ghost.UI = (function () {
   var me = {},
   
@@ -54,10 +53,10 @@ Ghost.UI.Module = (function () {
 
 
 /**
- * UI.Start
+ * UI.GameStart
  * Object that handles UI updates for game creation.
  */
-Ghost.UI.Start = (function () {
+Ghost.UI.GameStart = (function () {
   me = Ghost.Util.create(Ghost.UI.Module);
   
   me.register('click', 'addInvitee', function () {
@@ -128,9 +127,9 @@ Ghost.UI.GameList = (function () {
 
 /**
  * UI.Game
- * This will probably need to be split up once it starts
- * getting really large.
  */
+// TODO(qarren): This will probably need to be split up once it starts
+// getting really large.
 Ghost.UI.Game = (function () {
   var me = Ghost.Util.create(Ghost.UI.Module);
   

@@ -1,7 +1,6 @@
 var mongo = require('mongodb'),
     Db = mongo.Db,
     Server = mongo.Server,
-
     dbName = 'ghost',
     host = '127.0.0.1',
     port = 27017;
@@ -10,7 +9,7 @@ var _client = new Db(dbName, new Server(host, port, {}));
 
 /**
  * db.client
- * will give a new client object to the callback function
+ * Will give a new client object to the callback function.
  * @param {function} callback
  */
 exports.client = function (callback) {
@@ -21,6 +20,12 @@ exports.client = function (callback) {
   callback(_client);
 };
 
+/**
+ * db.getCollection
+ * Will give the given collection from the database to the callback function.
+ * @param {string} name
+ * @param {function} callback
+ */
 exports.getCollection = function (name, callback) {
   var client, collection, e;
 
