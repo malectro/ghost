@@ -125,10 +125,14 @@ Ghost.Game = (function () {
   };
   
   me.getByEmailOrPhone = function (emailOrPhone, callback) {
-    var getter = {};
+    var getter = {},
+        thisUser = Ghost.User.getUser();
     
     emailOrPhone = emailOrPhone.trim();
   
+    if (emailOrPhone === thisUser.phone || emailOrPhone === thisUser.email) {
+      return Ghost.UI.GameStart.errorInvitee('You cannot invite yourself!  Don\'t even try!');
+    }
     if (me.isPhone(emailOrPhone)) {
       getter.phone = emailOrPhone;
     }
