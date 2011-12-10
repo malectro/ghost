@@ -152,7 +152,6 @@ Ghost.UI.Game = (function () {
     if (response) {
       $('#game-status').text('Waiting on ' + response.user.username);
     }
-    $('#game-input').attr('disabled', true);
     $('#game-input').hide();
   }
 
@@ -160,10 +159,10 @@ Ghost.UI.Game = (function () {
     console.log(game);
     
     location.hash = '#game';
-    $('#game-string').text(game.letters);
+    $('#game-string').text(game.letters || '');
     
     if (game.myTurn) {
-      $('#game-input').removeAttr('disabled').focus();
+      $('#game-input').val('').show();
       $('#game-status').text('Your turn!');
     }
     else {
@@ -238,11 +237,46 @@ Ghost.UI.Register = (function () {
   
   me = Ghost.Util.create(Ghost.UI.Module);
   
+  me.validate = function(formFields) {
+    var errors = '';
+    for(i=0; i<formFields.length; i++) {
+      var field = formFields[i];
+      switch (field.name) {
+        case 'email':
+          if (!Ghost.Util.isEmail(field.value)) {
+            errors += 'Please provide a properly formatted email address.<br />'
+          }
+          break;
+        case 'phone':
+          if (!Ghost.Util.isPhone(field.value)) {
+            errors += 'Please provide a properly formatted phone number.<br />'
+          }
+          break;
+        default:
+          if (!field.value) {
+            errors += 'Please provide a ' + field.name + '.<br />'
+          }
+          break;
+      }
+    }
+    return errors;
+  };
+
+  me.showError = function (msg) {
+    $('.error').hide();
+    $('#create-error').html(msg).show();
+  };
+  
   me.register('submit', 'register', function () {
-    Ghost.Ajax.get('/user/create', {
-      data: $(this).serialize(),
-      success: Ghost.Credentials.setCredentials
-    });
+    var validation = Ghost.UI.Register.validate($(this).serializeArray());
+    if(validation) {
+      Ghost.UI.Register.showError(validation);
+    } else {  
+      Ghost.Ajax.get('/user/create', {
+        data: $(this).serialize(),
+        success: Ghost.Credentials.setCredentials
+      });
+    }
     return false;
   });
   

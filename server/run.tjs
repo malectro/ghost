@@ -28,16 +28,17 @@ http.createServer(function (req, res) {
   if (typeof controller[reqUrl.method] !== 'function') {
     reqUrl.method = 'index';
   }
-  
+
   // standardize query lists and objects
   for (param in reqUrl.query) {
     i = param.indexOf('[]');
     if (i) {
       reqUrl.query[param.substr(0, i)] = reqUrl.query[param];
+      if (typeof reqUrl.query[param.substr(0, i)] === 'string') {
+        reqUrl.query[param.substr(0, i)] = [reqUrl.query[param.substr(0, i)]];
+      }
     }
   }
-  
-  console.log(reqUrl);
 
   //TODO(dbow): This is probably useless since JSONP doesn't allow POSTs...
   if (req.method == 'POST') {

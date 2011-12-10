@@ -133,10 +133,10 @@ Ghost.Game = (function () {
     if (emailOrPhone === thisUser.phone || emailOrPhone === thisUser.email) {
       return Ghost.UI.GameStart.errorInvitee('You cannot invite yourself!  Don\'t even try!');
     }
-    if (me.isPhone(emailOrPhone)) {
+    if (Ghost.Util.isPhone(emailOrPhone)) {
       getter.phone = emailOrPhone;
     }
-    else if (me.isEmail(emailOrPhone)) {
+    else if (Ghost.Util.isEmail(emailOrPhone)) {
       getter.email = emailOrPhone;
     }
     else {
@@ -148,14 +148,6 @@ Ghost.Game = (function () {
       success: callback
     });
 
-  };
-  
-  me.isPhone = function (number) {
-    return /^\d+$/.test(number);
-  };
-  
-  me.isEmail = function (email) {
-    return /^[a-zA-Z0-9\+\._]+@[a-zA-Z0-9_]+\.[a-z]+$/.test(email);
   };
       
   me.get = function (params, callback) {
@@ -174,9 +166,6 @@ Ghost.Game = (function () {
     }
 
     ids = _.pluck(_invitees, '_id');
-    
-    // Make sure creator is included in players list.
-    ids.push(Ghost.Credentials.getUserId());
     
     Ghost.Ajax.get('/game/create', {
       data: {players: ids},
@@ -252,6 +241,15 @@ Ghost.Ajax = (function () {
 Ghost.Util = (function () {
 
   var me = {};
+  
+  // TODO(dbow): Add actual phone number verification instead of just number.
+  me.isPhone = function (number) {
+    return /^\d+$/.test(number);
+  };
+  
+  me.isEmail = function (email) {
+    return /^[a-zA-Z0-9\+\._]+@[a-zA-Z0-9_]+\.[a-z]+$/.test(email);
+  };
   
   /**
    * copy

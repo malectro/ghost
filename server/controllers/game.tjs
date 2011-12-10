@@ -40,7 +40,7 @@ exports.create = function (options, callback) {
     return callback({e: 1, msg: 'Must specify players in ' +
                                 'players=userid1,userid2 format'});
   }
-  
+
   playerList.unshift(options.currentUser);
   
   firstPlayer = playerList[0];
@@ -137,7 +137,6 @@ exports.get = function (options, callback) {
 };
 
 exports.play = function (options, callback) {
-  console.log('hi', options);
   
   var games,
       client,
@@ -163,17 +162,12 @@ exports.play = function (options, callback) {
   
   game.letters += options.letter;
 
-  console.log(game.currentPlayer);
   currentPlayer = game.players.indexOf(game.currentPlayer);
-  console.log('currentPlayer: ' + currentPlayer);
   nextPlayer = currentPlayer + 1;
-  console.log('nextPlayer: ' + nextPlayer);
   if (nextPlayer === game.players.length) {
-    console.log('back to 0');
     nextPlayer = 0;
   }
   game.currentPlayer = game.players[nextPlayer];
-  console.log(game.currentPlayer);
 
   games.update(query, game);
   
