@@ -71,18 +71,19 @@ Ghost.UI.GameStart = (function () {
   });
   
   me.clear = function () {
+    $('.error').hide();
     $('.start_invite_field').val('');
-    $('.start_msg').html('');
     $('.start_invitees').html('');
   };
   
   me.errorInvitee = function (msg) {
-    $('.start_msg').html(msg);
+    $('.error').hide();
+    $('#privateStart-error').text(msg).show();
   };
   
   me.listInvitee = function (name) {
+    $('.error').hide();
     $('.start_invite_field').val('');
-    $('.start_msg').html('');
     $('.start_invitees').append(
       me.render('start_invitee', {name: name})
     );
