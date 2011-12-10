@@ -41,6 +41,8 @@ exports.create = function (options, callback) {
                                 'players=userid1,userid2 format'});
   }
   
+  playerList.unshift(options.currentUser);
+  
   firstPlayer = playerList[0];
   
   var newGame = {
@@ -78,8 +80,8 @@ exports.create = function (options, callback) {
  */
 exports.get = function (options, callback) {
 
-  var gameId = options['gameid'],
-      userId = options['userid'],
+  var gameId = options.gameid,
+      userId = options.userid,
       games,
       client;
   
@@ -102,7 +104,7 @@ exports.get = function (options, callback) {
     await {
       games.find(game).toArray(defer(e, gameDetails));
     }
-    console.log(game);
+    console.log(gameDetails);
   
     if (gameDetails.length) {
       callback({e: 0, game: gameDetails[0]});
@@ -127,7 +129,7 @@ exports.get = function (options, callback) {
     if (gameList.length) {
       callback({e: 0, games: gameList});
     } else {
-      callback({e: 2, msg: 'No games with that user.'});
+      callback({e: 2, games: []});
     }
     
     client.close();
@@ -135,7 +137,31 @@ exports.get = function (options, callback) {
 };
 
 exports.play = function (options, callback) {
+  console.log('hi', options);
+  
+  var games,
+      client,
+      e, game,
+      query;
+  
   await {
-    this.get({gameid: options.gameid}, defer(e, game));
+    db.getCollection(collectionName, defer(games, client));
   }
+  
+  query = {_id: new client.bson_serializer.ObjectID(options.gameid)};
+
+  await {
+    games.find(query).toArray(defer(e, game));
+  }
+  
+  if (!game.length) {
+    return callback({e: 1, msg: 'that game does not exist in our database.'});
+  }
+  game = game[0];
+  
+  game.letters += options.letter;
+  
+  games.update(query, game);
+  
+  callback(game);
 };

@@ -36,9 +36,10 @@ Ghost.UI.Module = (function () {
    * current module
    */
   me.register = function (event, funcName, func) {
-    this['event_' + funcName] = func;
-    $('.event_' + funcName).on(event, func);
-
+    funcName = funcName.split(' ');
+  
+    this['event_' + funcName[0]] = func;
+    $('.event_' + funcName).on(event, funcName[1], func);
   };
   
   /**
@@ -104,7 +105,7 @@ Ghost.UI.GameList = (function () {
     Ghost.Game.getList(null, _showGames)
   });
   
-  me.register('click', 'continueGame', function () {
+  me.register('click', 'continueGame li', function () {
     $('#game-input').focus();
     Ghost.Game.load(this.innerHTML);
   });
