@@ -188,6 +188,8 @@ Ghost.Game = (function () {
     }
   
     _currentGame = game;
+    _currentGame.myTurn = Ghost.Credentials.getUserId() === _currentGame.currentPlayer;
+    
     Ghost.UI.Game.load(game);
   };
   

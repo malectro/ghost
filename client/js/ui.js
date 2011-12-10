@@ -151,7 +151,13 @@ Ghost.UI.Game = (function () {
     
     location.hash = '#game';
     $('#game-string').text(game.letters);
-    $('#game-input').focus();
+    
+    if (game.myTurn) {
+      $('#game-input').removeAttr('disabled').focus(); 
+    }
+    else {
+      $('#game-input').attr('disabled', true);
+    }
   };
 
   return me;
