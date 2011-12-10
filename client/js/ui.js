@@ -117,7 +117,7 @@ Ghost.UI.GameList = (function () {
     _games = games.games;
     
     for (var i = 0; i < _games.length; i++) {
-      html += me.render('continue_list', {game: _games[0]._id});
+      html += me.render('continue_list', {game: _games[i]._id});
     }
     
     $('#continue-list').html(html);
