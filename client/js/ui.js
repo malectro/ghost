@@ -138,6 +138,7 @@ Ghost.UI.Game = (function () {
   me.register('keydown', 'changeLetter', function (e) {
     if (event.which === 13 && this.value != '') {
       Ghost.Game.play(this.value);
+      me.hideInput();
     }
     else if (event.which > 64 && event.which < 91) {
       this.value = '';
@@ -146,6 +147,14 @@ Ghost.UI.Game = (function () {
       e.preventDefault();
     }
   });
+  
+  me.hideInput = function(response) {
+    if (response) {
+      $('#game-status').text('Waiting on ' + response.user.username);
+    }
+    $('#game-input').attr('disabled', true);
+    $('#game-input').hide();
+  }
 
   me.load = function (game) {
     console.log(game);
@@ -154,10 +163,14 @@ Ghost.UI.Game = (function () {
     $('#game-string').text(game.letters);
     
     if (game.myTurn) {
-      $('#game-input').removeAttr('disabled').focus(); 
+      $('#game-input').removeAttr('disabled').focus();
+      $('#game-status').text('Your turn!');
     }
     else {
-      $('#game-input').attr('disabled', true);
+      Ghost.Ajax.get('/user/retrieve', {
+        data: {_id: game.currentPlayer},
+        success: Ghost.UI.Game.hideInput
+      });
     }
   };
 

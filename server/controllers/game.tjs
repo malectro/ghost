@@ -142,7 +142,9 @@ exports.play = function (options, callback) {
   var games,
       client,
       e, game,
-      query;
+      query,
+      currentPlayer,
+      nextPlayer;
   
   await {
     db.getCollection(collectionName, defer(games, client));
@@ -160,7 +162,19 @@ exports.play = function (options, callback) {
   game = game[0];
   
   game.letters += options.letter;
-  
+
+  console.log(game.currentPlayer);
+  currentPlayer = game.players.indexOf(game.currentPlayer);
+  console.log('currentPlayer: ' + currentPlayer);
+  nextPlayer = currentPlayer + 1;
+  console.log('nextPlayer: ' + nextPlayer);
+  if (nextPlayer === game.players.length) {
+    console.log('back to 0');
+    nextPlayer = 0;
+  }
+  game.currentPlayer = game.players[nextPlayer];
+  console.log(game.currentPlayer);
+
   games.update(query, game);
   
   callback(game);
